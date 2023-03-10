@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="31929532-ce7a-4e2b-ac3d-8645021a8b4b" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="27052fa1-b8c4-4359-ae88-2d8b895288be" >
+		<salesforce:basic-connection username="mallika@auropro.com" password="Arjun@2531" securityToken="ONE1B7uHRQejksWP4Q0w18UE5" />
+	</salesforce:sfdc-config>
+	<flow name="replay-idFlow" doc:id="f7620123-e2d3-4504-9ccd-33ba3ba45bac" >
+		<http:listener doc:name="Listener" doc:id="3f1dcdc1-4fa8-48f2-a296-e7144215fbca" config-ref="HTTP_Listener_config" path="replay"/>
+		<salesforce:create type="Replay__c" doc:name="Create" doc:id="a2d7bb89-bf9b-4eb3-aabd-b808b8041421" config-ref="Salesforce_Config">
+			<salesforce:records ><![CDATA[#[[{
+	"id__c":payload.id
+}]]]]></salesforce:records>
+		</salesforce:create>
+	</flow>
+	<flow name="replay-idFlow1" doc:id="0546d9af-2252-4983-88a8-0933a1fe46fc" >
+		<salesforce:replay-channel-listener doc:name="Replay channel listener" doc:id="23d2f1b6-15da-44f4-afed-b3d0789eb612" config-ref="Salesforce_Config" streamingChannel="/data/Replay__ChangeEvent" replayOption="ALL" autoReplay="true"/>
+		<logger level="INFO" doc:name="Logger" doc:id="fe3a4d85-cab1-453c-b07b-8e78721cc2cb" message="#[payload]"/>
+	</flow>
+</mule>
